@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, render_template
 import requests as req
 import json
 import base64
@@ -6,17 +6,20 @@ import markdown2 as md2
 import os
 import re
 
-URL = ""
+URL = "https://api.github.com/repos/icehongssii/tech-blog-obsidian/contents/tech-blog/posts/blogs"
 
-app = Flask(__name__)
+app = Flask(__name__,
+            static_folder='../static',  # Set the correct path to the 'static' folder.
+            template_folder='../templates'
+            )
+            
 
-
-def get_list(u) -> str:
-    res = req.get(u)
-    data = res.json()
-    content = data['content']
-    decoded_content = base64.b64decode(content).decode('utf-8')
-    return decoded_content
+@app.route("/")
+def index():
+    res = req.get(URL)
+    postList = res.json()    
+    postCnt = len(postList)
+    return render_template('index.html', posts=postList, cnt=postCnt)
 
 def convert_md_to_HTML(decoded_content: str) -> str:
     html = md2.markdown(decoded_content, extras=["metadata", "highlightjs-lang",
@@ -26,17 +29,6 @@ def convert_md_to_HTML(decoded_content: str) -> str:
                                                     ])
 
     return html
-    
-    
-@app.route("/d", methods=["GET"])
-def returnMd():
-    ddd = get_list(URL)    
-    md = convert_md_to_HTML(ddd)
-    return md
 
 
-
-@app.route('/')
-def show_markdown():
-    print("hi")
 

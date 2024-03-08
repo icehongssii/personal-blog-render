@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "personal-blog-render"
+version = "0.1.0"
+description = ""
+authors = ["icehongssii"]
+readme = "README.md"
+packages = [{include = "personal_blog_render"}]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+flask = "^3.0.2"
+requests = "^2.31.0"
+markdown2 = "^2.4.13"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

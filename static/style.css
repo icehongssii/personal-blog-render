@@ -207,8 +207,7 @@ header .container nav.site-nav p{
     line-height:1.65
 }
 footer .container{
-    padding:30px 0 100px 0;
-    /* padding:30px 0 150px 0; */
+    padding:30px 0 150px 0;
     border-top:.5px solid #888
 }
 footer .container p{
@@ -217,34 +216,9 @@ footer .container p{
     text-align:center;
     line-height:1.8
 }
-
-.year {
-    padding-top:10px;
-    padding-bottom:10px;
-    display: flex; /* Aligns children inline and allows alignment control */
-    align-items: center; /* Vertically centers the children */
-    justify-content: start; /* Aligns children at the start of the container */
-    gap: 10px; /* Adds space between the h1 and span elements */
-    /* Add additional styles as needed, such as padding, background, etc. */
-}
-
-.year h1 {
-    margin: 0; /* Removes default margin from h1 for better control */
-    /* Additional h1 styles like font-size, color etc., as needed */
-}
-
-.year span {
-    /* Styles for the span tag */
-    font-size: 0.8em; /* Smaller than the h1 tag, adjust as needed */
-    color: #666; /* Example color, adjust as needed */
-    /* Additional span styles like background, padding etc., as needed */
-}
-
-
 .posts .post-info{
     box-sizing:border-box;
-    padding:8px 0 6px 0;
-    /* padding:32px 0 24px 0; */
+    padding:32px 0 24px 0;
     width:100%;
     overflow:hidden;
     text-overflow:ellipsis;
@@ -266,8 +240,7 @@ footer .container p{
     color:#888
 }
 .posts .post-info .entry{
-    margin:4px 0
-    /* margin:16px 0 */
+    margin:16px 0
 }
 .posts .post-info .read-more{
     font-weight:200;
@@ -708,3 +681,82 @@ img.small-icon{
     font-size:0.8rem;
     margin-left:6px
 }
+
+
+/***************************************/
+
+footer .container{
+    padding:30px 0 100px 0;
+    /* padding:30px 0 150px 0;  << original */
+    border-top:.5px solid #888
+}
+
+.posts .post-info{
+    box-sizing:border-box;
+    padding:8px 0 6px 0;
+    /* padding:32px 0 24px 0; <<< original */
+    width:100%;
+    overflow:hidden;
+    text-overflow:ellipsis; 
+    font-weight:300;
+    border-bottom:1px solid #eaeaea
+}
+
+.posts .post-info .entry{
+    margin:4px 0;
+    /* margin:16px 0; <<< original*/
+}
+
+
+.year {
+    padding-top:10px;
+    padding-bottom:10px;
+    display: flex; /* Aligns children inline and allows alignment control */
+    align-items: center; /* Vertically centers the children */
+    justify-content: start; /* Aligns children at the start of the container */
+    gap: 10px; /* Adds space between the h1 and span elements */
+    /* Add additional styles as needed, such as padding, background, etc. */
+}
+
+.year h1 {
+    margin: 0; /* Removes default margin from h1 for better control */
+    /* Additional h1 styles like font-size, color etc., as needed */
+}
+
+.year span {
+    /* Styles for the span tag */
+    font-size: 0.8em; /* Smaller than the h1 tag, adjust as needed */
+    color: #666; /* Example color, adjust as needed */
+    /* Additional span styles like background, padding etc., as needed */
+}
+
+/* Example of different styling for <code> elements with the "ad-note" class */
+
+
+code[class^="ad-"]  /* code.ad-note*/ {
+    padding: 20px 30px;
+    margin-bottom: 50px;
+    color: #6f7277;
+    line-height: 1.6;
+
+    width: 100%;
+    color: black; /* Light text color */
+    background-color: #fafafa;    ; /* Dark background color */
+    padding: 30px 20px; /* Padding inside the box */
+    border-radius: 20px; /* Rounded corners */
+    font-family: Arial, sans-serif; /* Example font */
+    display: inline-flex; /* Use flex to align icon and text */
+    align-items: center; /* Center items vertically */
+    font-size: 1rem; /* Text size */
+    padding-right:10px;
+    overflow: scroll;
+}
+
+@media screen and (max-width: 640px){
+    .post-page .meta-information{
+        padding:10px 4px
+    }
+}
+
+
+

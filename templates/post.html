@@ -22,6 +22,7 @@
 
 
 <body>
+    <div id="MathJax_Message" style="display: none;"></div>
     <header>
         <div class="container">
             <div class="site-info">
@@ -46,53 +47,71 @@
         </div>
     </header>
 
+
     <div id="main" role="main" class="container">
-<div class="posts">
+        <article class="post-page">
+    <h1 class='title'>김치찌개</h1>
 
- <div class="year">
-    <h1>2024년</h1>
-    <span>{{cnt}}개의 글</span> 
-</div>
-<!-- for post in site.posts -->
-
-     {% for post in posts %}
-        <div class="post-info">
-            <div class="entry">
-                <a href="/posts/{{ post.url }}">
-                {{ post.name }}
-                </a>
-            </div>
-        </div>
-        {% endfor %}
-        
-
-<!-- Post list-->
-
-<div class="year">
-    <h1>2023년</h1>
-    <span>{{cnt}}개의 글</span> 
-</div>
-
-<!-- for post in site.posts -->
-
-{% for post in posts %}
-<div class="post-info">
-    <div class="entry">
-        <a href="/posts/{{ post.url }}">
-        {{ post.name }}
-        </a>
+    <div class="date">
+        {{meta.created}}
     </div>
+    <div class="date">
+        {{meta.last_updated}}
+    </div>
+
+    
+    <div class='meta-information'>
+        <table>
+            
+            
+            <tr>
+                <td>제작기간</td>
+                <td>2022년 07월 02일 ~ 08월 02일</td>
+            </tr>
+            
+            
+            
+            <tr>
+                <td>태그</td>
+                <td>                    
+                    <a href='/about/#CPP'><span>CPP</span></a>                    
+                    <a href='/about/#Project'><span>Project</span></a>                    
+                </td>
+            </tr>
+            
+            
+            
+            <tr>
+                <td>GitHub</td>
+                <td>
+                    <a href=https://github.com/viyamKUN/shooting-game target="_blank"><img src="/assets/small-git.png" class='small-icon'>
+</a>
+                </td>
+            </tr>
+            
+        </table>
+    </div>
+    
+
+    <div class="entry">
+        {{html|safe}}
+
+    </div>
+
+
+    <div>
+    <center>
+        <img src="{{ url_for('static', filename='assets/icepersimmon.png') }}" class='my-icon'>
+    </center>
 </div>
-{% endfor %}
+
+    
 
 
-<!-- Post list-->
-</div>
+    
+</article>
 
 
-
-<!-- Pagination links -->
-<!-- Pagination links -->
     </div>
 
     <footer>

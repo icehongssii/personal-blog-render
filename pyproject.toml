@@ -13,6 +13,8 @@ requests = "^2.31.0"
 markdown2 = "^2.4.13"
 pygments = "^2.17.2"
 markdown = "^3.5.2"
+bs4 = "^0.0.2"
+lxml = "^5.1.0"
 
 
 [build-system]

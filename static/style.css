@@ -758,5 +758,9 @@ code[class^="ad-"]  /* code.ad-note*/ {
     }
 }
 
+.tags {
+    overflow:scroll;
+}
+
 
 

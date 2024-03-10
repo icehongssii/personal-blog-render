@@ -1,0 +1,115 @@
+<html><head>
+    <title>icehongssii</title>
+    <link rel="icon" href="{{ url_for('static', filename='assets/icepersimmon.png') }}" type="image/x-icon"> 
+    <meta charset="utf-8">
+<meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+
+
+<meta name="description" content="저쩌구 테스트">
+<meta property="og:description" content="저쩌구 프로퍼티">
+
+<meta name="author" content="">
+
+
+
+
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
+
+    <link rel="alternate" type="application/rss+xml" title="icehongssii" href="/feed.xml">
+</head>
+
+
+<body>
+    <div id="MathJax_Message" style="display: none;"></div>
+    <header>
+        <div class="container">
+            <div class="site-info">
+                <a href="/" class="site-title">icehongssii</a>
+                <p class="site-description">site-description</p>
+            </div>
+
+            <div class="grower"></div>
+
+            <nav class="site-nav">
+                <a href="/readings"><img src="{{ url_for('static', filename='assets/monster.svg') }}"></a>
+                <p>READING</p>
+            </nav>
+            <nav class="site-nav">
+                <a href="/about"><img src="{{ url_for('static', filename='assets/sun.svg') }}"></a>
+                <p>ABOUT</p>
+            </nav>
+            <nav class="site-nav">
+                <a href="/tags"><img src="{{ url_for('static', filename='assets/cloud.svg') }}"></a>
+                <p>TAGS</p>
+            </nav>
+        </div>
+    </header>
+
+
+    <div id="main" role="main" class="container">
+        <article class="post-page">
+    <h1 class='title'>태그</h1>
+    
+   
+
+    <div class="entry">
+
+
+        <div class="all_tags" id="all_tags">
+            <div class="tags">
+                {% for tag in tags.keys() %}
+                <a href="#{{ tag.split('(')[0] }}">{{ tag }}</a>
+                {% endfor %}
+            </div>
+        </div>
+        <div class="tag_boxes">
+            {% for tag, items in tags.items() %}
+            <div class="tag_box">
+                <h4 id="{{ tag.split('(')[0] }}">{{ tag.split('(')[0] }}</h4>
+                {% for item in items %}
+                <div class="post_list">
+                    <a href="/posts/{{ item }}.md?ref=main">{{ item }}</a>
+                    <!-- Optionally add a date span here if you have that information -->
+                </div>
+                {% endfor %}
+            </div>
+            {% endfor %}
+        
+
+    </div>
+
+
+    <div>
+    <center>
+        <img src="{{ url_for('static', filename='assets/icepersimmon.png') }}" class='my-icon'>
+    </center>
+</div>
+
+    
+
+
+    
+</article>
+
+
+    </div>
+
+    <footer>
+        <div class="container">
+            <p><a href="mailto:icehongssii@gmail.com">icehongssii@gmail.com</a></p>
+            <p><a href="https://github.com/icehongssii">GitHub @icehongssii</a></p>
+            <p><a href="https://twitter.com/icehongssii">Twitter @icehongssii</a></p>
+        </div>
+    </footer>
+
+    
+	<!-- Google Analytics -->
+	<!-- End Google Analytics -->
+
+
+
+
+
+</body></html>

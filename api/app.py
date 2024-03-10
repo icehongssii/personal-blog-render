@@ -16,6 +16,34 @@ app = Flask(__name__,
             )
 
 
+@app.route("/about")
+def getAbout():
+    about = """
+
+
+## Iceheongssii
+
+2.9년 경력의 소프트웨어 개발자!  
+컨테이너, 파이썬, AWS를 좋아하고 사용하는데 익숙합니다.
+
+
+```ad-note
+tl;dr
+- 개발에서 관심있는 분야 : devops문화, python, 클라우드, K8S
+- 개발 외에 관심있는 분야 : 블록체인, NFT, 게임, 만화, obsidian, 생산성
+```
+
+### 제가 해본 미친짓
+
+- 코스프레 대회 1등
+- 인도네시아 피칭대회 1등
+- MIT 원서넣기
+
+
+    
+    """
+    html = convert_md_to_HTML(about)
+    return render_template('about.html', html = html)
 
 @app.route("/tags")
 def getTags():

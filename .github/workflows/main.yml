@@ -31,7 +31,7 @@ jobs:
     - name: Run unit tests
       run: |
         cd api
-        poetry run python -m unittest ./api/test_app.py
+        poetry run python -m unittest test_app.py
 
         - name: Login to Amazon ECR
         uses: aws-actions/amazon-ecr-login@v1

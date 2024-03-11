@@ -2,14 +2,24 @@ import requests as req
 import base64
 import markdown2 as md2
 from bs4 import BeautifulSoup as bs
-from flask import Flask, render_template
+from fastapi import FastAPI, Request
+from fastapi.responses import HTMLResponse
+from fastapi.staticfiles import StaticFiles
+from fastapi.templating import Jinja2Templates
+from pathlib import Path
+
+
+
+app = FastAPI()
+BASE_DIR = Path(__file__).resolve().parent.parent  # 프로젝트 루트 디렉토리
+app.mount("/static", StaticFiles(directory=BASE_DIR / "static"), name="static")
+templates = Jinja2Templates(directory=BASE_DIR / "templates")
+
 
 # Constants
 URL = "https://api.github.com/repos/icehongssii/tech-blog-obsidian/contents/tech-blog/posts/blogs/"
 META_URL = "https://api.github.com/repos/icehongssii/tech-blog-obsidian/contents/tech-blog/posts/html/blog-meta.md"
 ABOUT_CONTENT = """
-
-
 ## Iceheongssii
 
 2.9년 경력의 소프트웨어 개발자!  
@@ -26,16 +36,13 @@ tl;dr
 
 - 코스프레 대회 1등
 - 인도네시아 피칭대회 1등
-- MIT 원서넣기
-
-
-    
+- MIT 원서넣기    
     """
 
 
 
 
-app = Flask(__name__, static_folder='../static', template_folder='../templates')
+
 
 # Utility Functions
 def fetch_github_content(url):
@@ -56,32 +63,39 @@ def extract_tags_from_html(html_content):
         data_dict[key] = values
     return data_dict
 
-# Route Handlers
-@app.route("/about")
-def get_about():
+# # Route Handlers
+@app.get("/about", response_class=HTMLResponse)
+def get_about(request:Request):
     html_content = convert_md_to_html(ABOUT_CONTENT)
-    return render_template('about.html', html=html_content)
+    return templates.TemplateResponse("about.html", {"request": request, "html": html_content})
+    
 
-@app.route("/tags")
-def get_tags():
+@app.get("/tags", response_class=HTMLResponse)
+def get_tags(request:Request):
     decoded_post = fetch_github_content(META_URL)
     html_content = convert_md_to_html(decoded_post)
     tags = extract_tags_from_html(html_content)
-    return render_template('tags.html', tags=tags)
+    return templates.TemplateResponse("tags.html", {"request": request, "tags": tags})
 
-@app.route("/posts/<title>", methods=["GET"])
-def post_detail(title):
+    
+
+@app.get("/posts/{title}", response_class=HTMLResponse)
+def post_detail(request:Request,title:str):
     post_content = fetch_github_content(URL + f"{title}")
     html = convert_md_to_html(post_content)
     html.metadata['last_updated'] = html.metadata['last-updated']
-    return render_template('post.html', meta=html.metadata, html=html)
+    return templates.TemplateResponse("post.html", {"request": request, "meta": html.metadata, "html": html})
 
-@app.route("/")
-def index():
+@app.get("/", response_class=HTMLResponse)
+def index(request:Request):
     post_list = req.get(URL).json()
     post_cnt = len(post_list)
+    
     posts = [{"url": p['url'].split(URL)[1], "name": p['name']} for p in post_list]
-    return render_template('index.html', posts=posts, cnt=post_cnt)
+
+    return templates.TemplateResponse("index.html", {"request": request, "posts": posts, "cnt": post_cnt})
+    
+
 
 if __name__ == "__main__":
     app.run(debug=True)

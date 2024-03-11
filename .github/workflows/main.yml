@@ -16,30 +16,34 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v2
       with:
-        python-version: '3.9'  # Set your Python version here
+        python-version: '3.10'  # Set your Python version here
 
-    - name: Install dependencies
+    - name: Install Poetry
       run: |
         pip install --upgrade pip
-        pip install -r requirements.txt  # Or use your preferred method (like poetry)
+        pip install poetry
 
-    - name: Run tests
+    - name: Install dependencies using Poetry
       run: |
-        python -m unittest discover
+        poetry config virtualenvs.create false
+        poetry install --no-interaction --no-ansi
 
-    - name: Log in to Amazon ECR
-      id: login-ecr
-      uses: aws-actions/amazon-ecr-login@v1
+    - name: Run unit tests
+      run: |
+        poetry run python -m unittest ./api/test_app.py
+
+        - name: Login to Amazon ECR
+        uses: aws-actions/amazon-ecr-login@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
 
     - name: Build, tag, and push image to Amazon ECR
       env:
-        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-        ECR_REPOSITORY: your-repository-name  # Change this to your repository's name
-        IMAGE_TAG: ${{ github.sha }}
+        ECR_REGISTRY: ${{ secrets.ECR_REGISTRY }}
+        ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY }}
+        IMAGE_TAG: latest  # Change this as necessary
       run: |
         docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
         docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-
-    - name: Update an ECR image tag (optional)
-      run: |
-        # Optional: Add any additional AWS CLI commands to update tags or service definitions

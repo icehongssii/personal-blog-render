@@ -1,24 +1,13 @@
 import requests as req
-import json
 import base64
 import markdown2 as md2
-import os
-import re
-from bs4 import BeautifulSoup as bs, element
-
+from bs4 import BeautifulSoup as bs
 from flask import Flask, render_template
+
+# Constants
 URL = "https://api.github.com/repos/icehongssii/tech-blog-obsidian/contents/tech-blog/posts/blogs/"
 META_URL = "https://api.github.com/repos/icehongssii/tech-blog-obsidian/contents/tech-blog/posts/html/blog-meta.md"
-
-app = Flask(__name__,
-            static_folder='../static',  # Set the correct path to the 'static' folder.
-            template_folder='../templates'
-            )
-
-
-@app.route("/about")
-def getAbout():
-    about = """
+ABOUT_CONTENT = """
 
 
 ## Iceheongssii
@@ -42,53 +31,57 @@ tl;dr
 
     
     """
-    html = convert_md_to_HTML(about)
-    return render_template('about.html', html = html)
 
-@app.route("/tags")
-def getTags():
-    res = req.get(META_URL)
-    data = res.json()
-    post = data['content']
-    decodedPost = base64.b64decode(post).decode('utf-8')
-    html = convert_md_to_HTML(decodedPost)
-    htmlObj = bs(html, "lxml")
+
+
+
+app = Flask(__name__, static_folder='../static', template_folder='../templates')
+
+# Utility Functions
+def fetch_github_content(url):
+    response = req.get(url)
+    data = response.json()
+    return base64.b64decode(data['content']).decode('utf-8')
+
+def convert_md_to_html(markdown_content):
+    return md2.markdown(markdown_content, extras=["metadata", "highlightjs-lang", "spoiler", "tables", 'fenced-code-blocks', "admonitions"])
+
+def extract_tags_from_html(html_content):
+    html_obj = bs(html_content, "lxml")
     data_dict = {}
-    
-    for row in htmlObj.tbody.find_all("tr"):    
+    for row in html_obj.tbody.find_all("tr"):
         cells = row.find_all("td")
         key = cells[0].text.strip()
         values = [li.text.strip() for li in cells[1].find("ul").find_all("li")]
         data_dict[key] = values
-        
-    return render_template('tags.html', tags = data_dict)
+    return data_dict
 
+# Route Handlers
+@app.route("/about")
+def get_about():
+    html_content = convert_md_to_html(ABOUT_CONTENT)
+    return render_template('about.html', html=html_content)
 
-            
+@app.route("/tags")
+def get_tags():
+    decoded_post = fetch_github_content(META_URL)
+    html_content = convert_md_to_html(decoded_post)
+    tags = extract_tags_from_html(html_content)
+    return render_template('tags.html', tags=tags)
+
 @app.route("/posts/<title>", methods=["GET"])
-def postDetail(title):
-    res = req.get(URL+f"{title}")    
-    data = res.json()
-    post = data['content']
-    decodedPost = base64.b64decode(post).decode('utf-8')
-    html = convert_md_to_HTML(decodedPost)
-    html.metadata['last_updated']=html.metadata['last-updated']
-    return render_template('post.html', meta = html.metadata, html = html)
-    
+def post_detail(title):
+    post_content = fetch_github_content(URL + f"{title}")
+    html = convert_md_to_html(post_content)
+    html.metadata['last_updated'] = html.metadata['last-updated']
+    return render_template('post.html', meta=html.metadata, html=html)
 
 @app.route("/")
 def index():
-    res = req.get(URL)
-    postList = res.json()    
-    postCnt = len(postList)
-    postList = [ {"url":p['url'].split(URL)[1], "name":p['name']} for p in postList]
-    return render_template('index.html', posts=postList, cnt=postCnt)
+    post_list = req.get(URL).json()
+    post_cnt = len(post_list)
+    posts = [{"url": p['url'].split(URL)[1], "name": p['name']} for p in post_list]
+    return render_template('index.html', posts=posts, cnt=post_cnt)
 
-def convert_md_to_HTML(decoded_content: str) -> str:
-    html = md2.markdown(decoded_content, extras=["metadata", "highlightjs-lang",
-                                                    "spoiler","tables",
-                                                    'fenced-code-blocks',
-                                                    "admonitions"
-                                                    ])
-
-    return html
+if __name__ == "__main__":
+    app.run(debug=True)

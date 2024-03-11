@@ -15,6 +15,7 @@ pygments = "^2.17.2"
 markdown = "^3.5.2"
 bs4 = "^0.0.2"
 lxml = "^5.1.0"
+pytest = "^8.1.1"
 
 
 [build-system]

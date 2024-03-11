@@ -1,6 +1,6 @@
 <html><head>
     <title>icehongssii</title>
-    <link rel="icon" href="{{ url_for('static', filename='assets/icepersimmon.png') }}" type="image/x-icon"> 
+    <link rel="icon" href="{{ url_for('static', path='assets/icepersimmon.png') }}" type="image/x-icon"> 
     <meta charset="utf-8">
 <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -15,7 +15,7 @@
 
 
 
-<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', path='style.css') }}">
 
     <link rel="alternate" type="application/rss+xml" title="icehongssii" href="/feed.xml">
 </head>
@@ -33,15 +33,15 @@
             <div class="grower"></div>
 
             <nav class="site-nav">
-                <a href="/"><img src="{{ url_for('static', filename='assets/monster.svg') }}"></a>
+                <a href="/"><img src="{{ url_for('static', path='assets/monster.svg') }}"></a>
                 <p>READING</p>
             </nav>
             <nav class="site-nav">
-                <a href="/about"><img src="{{ url_for('static', filename='assets/sun.svg') }}"></a>
+                <a href="/about"><img src="{{ url_for('static', path='assets/sun.svg') }}"></a>
                 <p>ABOUT</p>
             </nav>
             <nav class="site-nav">
-                <a href="/tags"><img src="{{ url_for('static', filename='assets/cloud.svg') }}"></a>
+                <a href="/tags"><img src="{{ url_for('static', path='assets/cloud.svg') }}"></a>
                 <p>TAGS</p>
             </nav>
         </div>
@@ -59,7 +59,7 @@
 
     <div>
     <center>
-        <img src="{{ url_for('static', filename='assets/icepersimmon.png') }}" class='my-icon'>
+        <img src="{{ url_for('static', path='assets/icepersimmon.png') }}" class='my-icon'>
     </center>
 </div>
 

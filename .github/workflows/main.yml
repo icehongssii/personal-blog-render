@@ -3,7 +3,7 @@ name: Build and Push to ECR
 on:
   push:
     branches:
-      - main  # Set your default branch here
+      - develop  # Set your default branch here
 
 jobs:
   build-and-push:

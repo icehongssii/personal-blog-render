@@ -30,6 +30,7 @@ jobs:
 
     - name: Run unit tests
       run: |
+        cd api
         poetry run python -m unittest ./api/test_app.py
 
         - name: Login to Amazon ECR

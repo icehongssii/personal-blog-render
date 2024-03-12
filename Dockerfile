@@ -24,7 +24,7 @@ COPY ./static /app/static
 COPY ./templates /app/templates
 
 # You can configure the startup command in the CMD directive if needed
-CMD ["uvicorn", "api.app:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uvicorn", "api.app:app", "--host", "0.0.0.0", "--port", "80"]
 
 
 # If app.py is not using FastAPI and needs to be run differently,

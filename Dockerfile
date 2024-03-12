@@ -1,30 +1,32 @@
-# Use an official Python runtime as a parent image
-FROM python:3.10-slim
+# Use the base image with Python 3.10
+FROM tiangolo/uvicorn-gunicorn:python3.10-slim
 
-# Set the working directory in the container
+# Set the maintainer label
+LABEL maintainer="Sebastian Ramirez <tiangolo@gmail.com>"
+
+# Set the working directory to /app
 WORKDIR /app
 
-# Copy the current directory contents into the container at /app
-COPY . /app
+# Copy the Poetry configuration files
+COPY pyproject.toml poetry.lock* /app/
 
 # Install Poetry
-RUN pip install poetry
+RUN pip install --no-cache-dir poetry
 
-# Copy pyproject.toml and poetry.lock files
-COPY pyproject.toml poetry.lock ./
+# Disable the creation of virtual environments by Poetry
+# and install the dependencies globally
+RUN poetry config virtualenvs.create false \
+  && poetry install --no-interaction --no-ansi
 
-# Install project dependencies
-RUN poetry config virtualenvs.create false && \
-    poetry install --no-interaction --no-ansi
+# Copy the main application to the container
+COPY ./api /app/api
+COPY ./static /app/static
+COPY ./templates /app/templates
 
-# Make port 8000 available to the world outside this container
-EXPOSE 8000
+# You can configure the startup command in the CMD directive if needed
+CMD ["uvicorn", "api.app:app", "--host", "0.0.0.0", "--port", "8000"]
 
-# Define environment variable
-ENV FLASK_APP=api/app.py
-ENV FLASK_RUN_HOST=0.0.0.0
-ENV FLASK_RUN_PORT=8000
 
-# Run the application
-ENTRYPOINT ["poetry", "run", "flask", "run"]
-
+# If app.py is not using FastAPI and needs to be run differently,
+# adjust the CMD directive accordingly, e.g., for a Flask app:
+# CMD ["python", "app.py"]

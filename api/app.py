@@ -7,10 +7,20 @@ from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from pathlib import Path
-
+from typing import Any
 
 
 app = FastAPI()
+
+template = Jinja2Templates("/path/to/templates")
+
+def https_url_for(request: Request, name: str, **path_params: Any) -> str:
+    http_url = request.url_for(name, **path_params)
+    # Replace 'http' with 'https'
+    return http_url.replace("http", "https", 1)
+
+template.env.globals["https_url_for"] = https_url_for
+
 BASE_DIR = Path(__file__).resolve().parent.parent  # 프로젝트 루트 디렉토리
 app.mount("/static", StaticFiles(directory=BASE_DIR / "static"), name="static")
 templates = Jinja2Templates(directory=BASE_DIR / "templates")

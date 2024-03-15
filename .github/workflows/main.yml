@@ -3,12 +3,13 @@ name: Build and Push to ECR
 on:
   push:
     branches:
-      - develop  # Set your default branch here
+      - main
+      - develop  # Set your default branch here    
 
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
-    environment: dd # evn
+    environment: dd # env
 
     steps:
     - name: Checkout code
@@ -34,7 +35,10 @@ jobs:
       env:
         ECR_REGISTRY: ${{ secrets.ECR_REGISTRY }}
         ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY }}
-        IMAGE_TAG: latest  # Change this as necessary
+        BRANCH_NAME: ${{ github.ref_name }}
+        COMMIT_SHA: ${{ github.sha }}
       run: |
-        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
-        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$COMMIT_SHA .
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$COMMIT_SHA
+        docker tag $ECR_REGISTRY/$ECR_REPOSITORY:$COMMIT_SHA $ECR_REGISTRY/$ECR_REPOSITORY:$BRANCH_NAME
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$BRANCH_NAME      

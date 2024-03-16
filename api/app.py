@@ -1,25 +1,34 @@
-import requests as req
-import base64
-import markdown2 as md2
-from bs4 import BeautifulSoup as bs
+from typing import Any
+import os
 from fastapi import FastAPI, Request
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
+from starlette.middleware.base import BaseHTTPMiddleware
 from pathlib import Path
-from typing import Any
+import redis
+import requests as req
+import base64
+import markdown2 as md2
+from bs4 import BeautifulSoup as bs
+
+redis_host = os.getenv("REDIS_HOST")
+redis_client = redis.Redis(host=redis_host, port=6379, decode_responses=True)
+
+
+class HTTPSRedirectMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request: Request, call_next):
+        # Change the scheme to https
+        request.scope['scheme'] = 'https'
+        response = await call_next(request)
+        return response
 
 
 app = FastAPI()
 
-template = Jinja2Templates("/path/to/templates")
-
-def https_url_for(request: Request, name: str, **path_params: Any) -> str:
-    http_url = request.url_for(name, **path_params)
-    # Replace 'http' with 'https'
-    return http_url.replace("http", "https", 1)
-
-template.env.globals["https_url_for"] = https_url_for
+# 환경 변수를 체크하여 로컬 환경이 아닐 때만 HTTPSRedirectMiddleware를 적용합니다.
+if os.getenv("env") != "local":
+    app.add_middleware(HTTPSRedirectMiddleware)
 
 BASE_DIR = Path(__file__).resolve().parent.parent  # 프로젝트 루트 디렉토리
 app.mount("/static", StaticFiles(directory=BASE_DIR / "static"), name="static")

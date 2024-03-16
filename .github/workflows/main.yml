@@ -9,7 +9,7 @@ on:
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
-    environment: dd # env
+    environment: ${{ (github.ref == 'refs/heads/develop' && 'dd') || (github.ref == 'refs/heads/main' && 'prod') }}
 
     steps:
     - name: Checkout code
@@ -38,7 +38,10 @@ jobs:
         BRANCH_NAME: ${{ github.ref_name }}
         COMMIT_SHA: ${{ github.sha }}
       run: |
-        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$COMMIT_SHA .
+        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$COMMIT_SHA \
+                    --build-arg REDIS_HOST=${{ secrets.REDIS_HOST }} \
+                    --build-arg REDIS_PWD=${{ secrets.REDIS_PWD }} \
+                    .
         docker push $ECR_REGISTRY/$ECR_REPOSITORY:$COMMIT_SHA
         docker tag $ECR_REGISTRY/$ECR_REPOSITORY:$COMMIT_SHA $ECR_REGISTRY/$ECR_REPOSITORY:$BRANCH_NAME
-        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$BRANCH_NAME      
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$BRANCH_NAME

@@ -4,6 +4,8 @@ FROM tiangolo/uvicorn-gunicorn:python3.10-slim
 # Set the maintainer label
 LABEL maintainer="Sebastian Ramirez <tiangolo@gmail.com>"
 
+ARG REDIS_HOST
+ARG REDIS_PWD
 
 ENV REDIS_HOST=${REDIS_HOST}
 ENV REDIS_PWD=${REDIS_PWD}

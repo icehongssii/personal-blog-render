@@ -9,11 +9,11 @@ from pathlib import Path
 import redis
 import requests as req
 import base64
+import json
 import markdown2 as md2
 from bs4 import BeautifulSoup as bs
 
-redis_host = os.getenv("REDIS_HOST")
-redis_client = redis.Redis(host=redis_host, port=6379, decode_responses=True)
+app = FastAPI()
 
 
 class HTTPSRedirectMiddleware(BaseHTTPMiddleware):
@@ -23,11 +23,18 @@ class HTTPSRedirectMiddleware(BaseHTTPMiddleware):
         response = await call_next(request)
         return response
 
+redis_host = os.getenv("REDIS_HOST")
+redis_pwd = os.getenv("REDIS_PWD")
+redis_client = redis.Redis(
+        host = redis_host,
+        port=6379,
+        password=redis_pwd,
+        decode_responses=True
+    )    
 
-app = FastAPI()
 
 # 환경 변수를 체크하여 로컬 환경이 아닐 때만 HTTPSRedirectMiddleware를 적용합니다.
-if os.getenv("env") != "local":
+if os.getenv("ENV") != "local":
     app.add_middleware(HTTPSRedirectMiddleware)
 
 BASE_DIR = Path(__file__).resolve().parent.parent  # 프로젝트 루트 디렉토리
@@ -58,16 +65,28 @@ tl;dr
 - MIT 원서넣기    
     """
 
-
-
-
-
-
-# Utility Functions
 def fetch_github_content(url):
-    response = req.get(url)
-    data = response.json()
-    return base64.b64decode(data['content']).decode('utf-8')
+    # Create a unique key for storing the content in Redis.
+    # This could be the URL itself or some other unique identifier.
+    cache_key = f"content:{url}"
+    # Try fetching the content from Redis cache first.
+    try:
+        cache_data = redis_client.get(cache_key)
+    except redis.exceptions.ConnectionError:
+    # Redis 연결 문제 처리
+        print("Redis 연결에 실패했습니다.")
+        cache_data = None
+    if cache_data:
+        # If content exists in cache, return it without making an API call.
+        return cache_data
+    else:
+        response = req.get(url)
+        data = response.text
+        # Store the new content in Redis cache for future use.
+        # Set an expiration time for the cache, for example, 1 hour (3600 seconds).
+        redis_client.setex(cache_key, 3600, data) # json넣으면 안된다..
+        return data
+
 
 def convert_md_to_html(markdown_content):
     return md2.markdown(markdown_content, extras=["metadata", "highlightjs-lang", "spoiler", "tables", 'fenced-code-blocks', "admonitions"])
@@ -91,7 +110,8 @@ def get_about(request:Request):
 
 @app.get("/tags", response_class=HTMLResponse)
 def get_tags(request:Request):
-    decoded_post = fetch_github_content(META_URL)
+    data = json.loads(fetch_github_content(META_URL))
+    decoded_post = base64.b64decode(data['content']).decode('utf-8')
     html_content = convert_md_to_html(decoded_post)
     tags = extract_tags_from_html(html_content)
     return templates.TemplateResponse("tags.html", {"request": request, "tags": tags})
@@ -100,18 +120,17 @@ def get_tags(request:Request):
 
 @app.get("/posts/{title}", response_class=HTMLResponse)
 def post_detail(request:Request,title:str):
-    post_content = fetch_github_content(URL + f"{title}")
-    html = convert_md_to_html(post_content)
+    data = json.loads(fetch_github_content(URL + f"{title}"))
+    decoded_post = base64.b64decode(data['content']).decode('utf-8')
+    html = convert_md_to_html(decoded_post)
     html.metadata['last_updated'] = html.metadata['last-updated']
     return templates.TemplateResponse("post.html", {"request": request, "meta": html.metadata, "html": html})
 
 @app.get("/", response_class=HTMLResponse)
 def index(request:Request):
-    post_list = req.get(URL).json()
-    post_cnt = len(post_list)
-    
-    posts = [{"url": p['url'].split(URL)[1], "name": p['name']} for p in post_list]
-
+    data = json.loads(fetch_github_content(URL))
+    post_cnt = len(data)    
+    posts = [{"url": p['url'].split(URL)[1], "name": p['name']} for p in data]
     return templates.TemplateResponse("index.html", {"request": request, "posts": posts, "cnt": post_cnt})
     
 

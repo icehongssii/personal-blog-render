@@ -43,27 +43,9 @@ templates = Jinja2Templates(directory=BASE_DIR / "templates")
 
 
 # Constants
-URL = "https://api.github.com/repos/icehongssii/tech-blog-obsidian/contents/tech-blog/posts/blogs/"
-META_URL = "https://api.github.com/repos/icehongssii/tech-blog-obsidian/contents/tech-blog/posts/html/blog-meta.md"
-ABOUT_CONTENT = """
-## Iceheongssii
-
-2.9년 경력의 소프트웨어 개발자!  
-컨테이너, 파이썬, AWS를 좋아하고 사용하는데 익숙합니다.
-
-
-```ad-note
-tl;dr
-- 개발에서 관심있는 분야 : devops문화, python, 클라우드, K8S
-- 개발 외에 관심있는 분야 : 블록체인, NFT, 게임, 만화, obsidian, 생산성
-```
-
-### 제가 해본 미친짓
-
-- 코스프레 대회 1등
-- 인도네시아 피칭대회 1등
-- MIT 원서넣기    
-    """
+URL = "https://api.github.com/repos/icehongssii/tech-blog-obsidian/contents/tech-blog/2.%20posts/blogs/"
+TAG_URL = "https://api.github.com/repos/icehongssii/tech-blog-obsidian/contents/tech-blog/2.%20posts/html/tags.md"                                
+ABOUT_URL = "https://api.github.com/repos/icehongssii/tech-blog-obsidian/contents/tech-blog/2.%20posts/html/about.md"                                
 
 def fetch_github_content(url):
     # Create a unique key for storing the content in Redis.
@@ -104,13 +86,15 @@ def extract_tags_from_html(html_content):
 # # Route Handlers
 @app.get("/about", response_class=HTMLResponse)
 def get_about(request:Request):
-    html_content = convert_md_to_html(ABOUT_CONTENT)
+    data = json.loads(fetch_github_content(TAG_URL))
+    decoded_post = base64.b64decode(data['content']).decode('utf-8')
+    html_content = convert_md_to_html(decoded_post)
     return templates.TemplateResponse("about.html", {"request": request, "html": html_content})
     
 
 @app.get("/tags", response_class=HTMLResponse)
 def get_tags(request:Request):
-    data = json.loads(fetch_github_content(META_URL))
+    data = json.loads(fetch_github_content(TAG_URL))
     decoded_post = base64.b64decode(data['content']).decode('utf-8')
     html_content = convert_md_to_html(decoded_post)
     tags = extract_tags_from_html(html_content)

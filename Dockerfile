@@ -6,9 +6,11 @@ LABEL maintainer="Sebastian Ramirez <tiangolo@gmail.com>"
 
 ARG REDIS_HOST
 ARG REDIS_PWD
+ARG CONTENT_SOURCE_URL
 
 ENV REDIS_HOST=${REDIS_HOST}
 ENV REDIS_PWD=${REDIS_PWD}
+ENV CONTENT_SOURCE_URL=${CONTENT_SOURCE_URL}
 
 # Set the working directory to /app
 WORKDIR /app

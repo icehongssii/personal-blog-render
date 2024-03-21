@@ -24,7 +24,7 @@ jobs:
 
     - name: Login to Amazon ECR
       uses: aws-actions/amazon-ecr-login@v1
-            
+
     - name: Build, tag, and push image to Amazon ECR
       env:
         ECR_REGISTRY: ${{ secrets.ECR_REGISTRY }}
@@ -35,6 +35,8 @@ jobs:
         docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$COMMIT_SHA \
                     --build-arg REDIS_HOST=${{ secrets.REDIS_HOST }} \
                     --build-arg REDIS_PWD=${{ secrets.REDIS_PWD }} \
+                    --build-arg GIT_TOKEN=${{ secrets.GIT_TOKEN }} \
+                    --build-arg CONTENT_SOURCE_URL=${{ secrets.OBSIDIAN_REPO }} \
                     .
         docker push $ECR_REGISTRY/$ECR_REPOSITORY:$COMMIT_SHA
         docker tag $ECR_REGISTRY/$ECR_REPOSITORY:$COMMIT_SHA $ECR_REGISTRY/$ECR_REPOSITORY:$BRANCH_NAME

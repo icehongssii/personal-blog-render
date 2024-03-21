@@ -16,7 +16,10 @@ import markdown2 as md2
 from bs4 import BeautifulSoup as bs
 
 
-
+GIT_TOKEN = os.getenv("GIT_TOKEN")
+headers = {
+    'Authorization': f'token {GIT_TOKEN}',
+}
 
 
 class HTTPSRedirectMiddleware(BaseHTTPMiddleware):
@@ -60,10 +63,11 @@ app.mount("/static", StaticFiles(directory=BASE_DIR / "static"), name="static")
 
 # Constants
 BASE_URL = os.getenv("CONTENT_SOURCE_URL")
+#https://api.github.com/repos/icehongssii/tech-blog-obsidian/contents/tech-blog/2.%20posts
 INDEX_SOURCE = BASE_URL + "/blogs/"
-POST_SOURCE = BASE_URL + "/blogs/"
 TAGS_SOURCE = BASE_URL + "/html/tags.md"
 ABOUT_SOURCE = BASE_URL +"/html/about.md"
+
 
 def fetch_github_content(url):
     # Create a unique key for storing the content in Redis.
@@ -80,7 +84,7 @@ def fetch_github_content(url):
         # If content exists in cache, return it without making an API call.
         return cache_data
     else:
-        response = req.get(url)
+        response = req.get(url, headers=headers)
         data = response.text
         # Store the new content in Redis cache for future use.
         # Set an expiration time for the cache, for example, 1 hour (3600 seconds).
@@ -133,7 +137,7 @@ def post_detail(request:Request,title:str):
 def postList(request:Request):
     data = json.loads(fetch_github_content(INDEX_SOURCE))
     post_cnt = len(data)
-    posts = [{"url": p['url'].split(POST_SOURCE)[1], "name": p['name']} for p in data]
+    posts = [{"url": p['url'].split(INDEX_SOURCE)[1], "name": p['name']} for p in data]
     return templates.TemplateResponse("postList.html", {"request": request, "posts": posts, "cnt": post_cnt})
     
 

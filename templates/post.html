@@ -2,13 +2,20 @@
     <title>icehongssii</title>
     <link rel="icon" href="{{ url_for('static', path='assets/icepersimmon.png') }}" type="image/x-icon"> 
     <meta charset="utf-8">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    
+    <!-- and it's easy to individually load additional languages -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/go.min.js"></script>
+    
+    <script>hljs.highlightAll();</script>    
 <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 
 
-<meta name="description" content="저쩌구 테스트">
-<meta property="og:description" content="저쩌구 프로퍼티">
+<meta name="description" content="MOM, I am gonna rock">
+<meta property="og:description" content="MOM, I am gonna rock">
 
 <meta name="author" content="">
 
@@ -27,17 +34,17 @@
         <div class="container">
             <div class="site-info">
                 <a href="/" class="site-title">icehongssii</a>
-                <p class="site-description">site-description</p>
+                <p class="site-description">MOM, I am gonna rock</p>
             </div>
 
             <div class="grower"></div>
 
             <nav class="site-nav">
-                <a href="/"><img src="{{ url_for('static', path='assets/monster.svg') }}"></a>
-                <p>READING</p>
+                <a href="/posts"><img src="{{ url_for('static', path='assets/monster.svg') }}"></a>
+                <p>POSTS</p>
             </nav>
             <nav class="site-nav">
-                <a href="/about"><img src="{{ url_for('static', path='assets/sun.svg') }}"></a>
+                <a href="/"><img src="{{ url_for('static', path='assets/sun.svg') }}"></a>
                 <p>ABOUT</p>
             </nav>
             <nav class="site-nav">
@@ -50,48 +57,33 @@
 
     <div id="main" role="main" class="container">
         <article class="post-page">
-    <h1 class='title'>김치찌개</h1>
-
+    <h1 class='title'>{{meta.title}}</h1>
+            
     <div class="date">
-        {{meta.created}}
-    </div>
-    <div class="date">
-        {{meta.last_updated}}
+    <strong>마지막수정 {{meta.last_updated}} - 최초작성 {{meta.created}}</strong>
     </div>
 
     
     <div class='meta-information'>
         <table>
-            
-            
+
             <tr>
-                <td>제작기간</td>
-                <td>2022년 07월 02일 ~ 08월 02일</td>
-            </tr>
-            
-            
-            
-            <tr>
-                <td>태그</td>
-                <td>                    
-                    <a href='/about/#CPP'><span>CPP</span></a>                    
-                    <a href='/about/#Project'><span>Project</span></a>                    
+                <td><strong>태그</strong></td>
+                <td>         
+                    {% for tag in meta.tags %}
+                    <a href='/tags/##{{tag}}'><span>{{tag}}</span></a>                                                        
+                    {%endfor%}                               
                 </td>
             </tr>
-            
-            
-            
             <tr>
-                <td>GitHub</td>
+                <td><strong>tl;dr</strong></td>
                 <td>
-                    <a href=https://github.com/viyamKUN/shooting-game target="_blank"><img src="/assets/small-git.png" class='small-icon'>
-</a>
+                    {{meta.description}}
                 </td>
             </tr>
             
         </table>
     </div>
-    
 
     <div class="entry">
         {{html|safe}}
@@ -103,7 +95,7 @@
     <center>
         <img src="{{ url_for('static', path='assets/icepersimmon.png') }}" class='my-icon'>
     </center>
-</div>
+    </div>
 
     
 
@@ -118,7 +110,6 @@
         <div class="container">
             <p><a href="mailto:icehongssii@gmail.com">icehongssii@gmail.com</a></p>
             <p><a href="https://github.com/icehongssii">GitHub @icehongssii</a></p>
-            <p><a href="https://twitter.com/icehongssii">Twitter @icehongssii</a></p>
         </div>
     </footer>
 

@@ -5,6 +5,7 @@ from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from starlette.middleware.base import BaseHTTPMiddleware
+from fastapi.exceptions import HTTPException
 from pathlib import Path
 from urllib import parse
 import redis
@@ -14,7 +15,8 @@ import json
 import markdown2 as md2
 from bs4 import BeautifulSoup as bs
 
-app = FastAPI()
+
+
 
 
 class HTTPSRedirectMiddleware(BaseHTTPMiddleware):
@@ -24,8 +26,8 @@ class HTTPSRedirectMiddleware(BaseHTTPMiddleware):
         response = await call_next(request)
         return response
 
-redis_host = os.getenv("43.202.113.93")
-redis_pwd = os.getenv("yourpassword")
+redis_host = os.getenv("REDIS_HOST")
+redis_pwd = os.getenv("REDIS_PWD")
 redis_client = redis.Redis(
         host = redis_host,
         port=6379,
@@ -33,28 +35,37 @@ redis_client = redis.Redis(
         decode_responses=True
     )    
 
+def not_found_error(request: Request, exc: HTTPException):
+    return templates.TemplateResponse('404.html', {'request': request}, status_code=404)
 
+
+def internal_error(request: Request, exc: HTTPException):
+    return templates.TemplateResponse('500.html', {'request': request}, status_code=500)
+
+
+exception_handlers = {
+    404: not_found_error,
+    500: internal_error
+}
+
+app = FastAPI(exception_handlers=exception_handlers)
 # 환경 변수를 체크하여 로컬 환경이 아닐 때만 HTTPSRedirectMiddleware를 적용합니다.
 if os.getenv("ENV") != "local":
     app.add_middleware(HTTPSRedirectMiddleware)
 
 BASE_DIR = Path(__file__).resolve().parent.parent  # 프로젝트 루트 디렉토리
-app.mount("/static", StaticFiles(directory=BASE_DIR / "static"), name="static")
 templates = Jinja2Templates(directory=BASE_DIR / "templates")
+app.mount("/static", StaticFiles(directory=BASE_DIR / "static"), name="static")
 
 
 # Constants
 BASE_URL = os.getenv("CONTENT_SOURCE_URL")
-BASE_URL = "https://api.github.com/repos/icehongssii/tech-blog-obsidian/contents/tech-blog/2.%20posts"
 INDEX_SOURCE = BASE_URL + "/blogs/"
 POST_SOURCE = BASE_URL + "/blogs/"
 TAGS_SOURCE = BASE_URL + "/html/tags.md"
 ABOUT_SOURCE = BASE_URL +"/html/about.md"
 
 def fetch_github_content(url):
-    response = req.get(url)
-    data = response.text
-    return data
     # Create a unique key for storing the content in Redis.
     # This could be the URL itself or some other unique identifier.
     cache_key = f"content:{url}"
@@ -119,13 +130,12 @@ def post_detail(request:Request,title:str):
     return templates.TemplateResponse("post.html", {"request": request, "meta": html.metadata, "html": html})
 
 @app.get("/posts", response_class=HTMLResponse)
-def index(request:Request):
+def postList(request:Request):
     data = json.loads(fetch_github_content(INDEX_SOURCE))
     post_cnt = len(data)
     posts = [{"url": p['url'].split(POST_SOURCE)[1], "name": p['name']} for p in data]
-    return templates.TemplateResponse("index.html", {"request": request, "posts": posts, "cnt": post_cnt})
+    return templates.TemplateResponse("postList.html", {"request": request, "posts": posts, "cnt": post_cnt})
     
-
 
 if __name__ == "__main__":
     app.run(debug=True)

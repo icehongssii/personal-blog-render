@@ -323,7 +323,7 @@ footer .container p{
     font-style:normal
 }
 .post-page .meta-information table tr td:first-child:before{
-    content:"💡";
+    content:"🍊";
     padding-right:10px
 }
 .post-page p{
@@ -402,16 +402,7 @@ pre.highlight>code{
     padding:0;
     border:none
 }
-code{
-    background-color:#ecece7;
-    padding:2px 4px;
-    margin:4px 4px;
-    border-radius:4px;
-    border:1px solid #d8d8d8;
-    font-size:0.8rem;
-    font-family:'Hack', monospace;
-    vertical-align:text-top
-}
+
 .highlight,pre.highlight{
     color:#abb2bf
 }
@@ -683,7 +674,7 @@ img.small-icon{
 }
 
 
-/***************************************/
+/*****************************************************************************************************/
 
 footer .container{
     padding:30px 0 100px 0;
@@ -732,7 +723,6 @@ footer .container{
 
 /* Example of different styling for <code> elements with the "ad-note" class */
 
-
 code[class^="ad-"]  /* code.ad-note*/ {
     padding: 20px 30px;
     margin-bottom: 50px;
@@ -763,4 +753,30 @@ code[class^="ad-"]  /* code.ad-note*/ {
 }
 
 
+
+
+/* 전체 코드 블록 스타일 */
+code[class^="ad-"] {
+    background-color: #c8c8c8; /* 배경색 */
+    color: #ffffff; /* 글자색 */
+    border-radius: 10px; /* 모서리 둥글기 */
+    padding: 20px; /* 패딩 */
+    font-family: 'Courier New', Courier, monospace; /* 글꼴 */
+    width: auto; /* 너비 자동 조절 */
+    display: block; /* 블록 레벨 요소로 표시 */
+    margin: 20px 0; /* 상하 여백 */
+}
+
+/* 코드 블록 내부 스타일 */
+code.ad-note code {
+    color: #aeeff0; /* 코드 글자색 */
+}
+
+/* 코드 블록 제목 스타일 */
+code.ad-note::before {
+    content: attr(title); /* ::before 가상 요소로 title 속성값 표시 */
+    font-weight: bold; /* 제목 글자 두께 */
+    display: block; /* 블록 레벨 요소로 표시 */
+    margin-bottom: 10px; /* 제목 아래 여백 */
+}
 

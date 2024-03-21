@@ -6,6 +6,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from starlette.middleware.base import BaseHTTPMiddleware
 from pathlib import Path
+from urllib import parse
 import redis
 import requests as req
 import base64
@@ -23,8 +24,8 @@ class HTTPSRedirectMiddleware(BaseHTTPMiddleware):
         response = await call_next(request)
         return response
 
-redis_host = os.getenv("REDIS_HOST")
-redis_pwd = os.getenv("REDIS_PWD")
+redis_host = os.getenv("43.202.113.93")
+redis_pwd = os.getenv("yourpassword")
 redis_client = redis.Redis(
         host = redis_host,
         port=6379,
@@ -43,11 +44,17 @@ templates = Jinja2Templates(directory=BASE_DIR / "templates")
 
 
 # Constants
-URL = "https://api.github.com/repos/icehongssii/tech-blog-obsidian/contents/tech-blog/2.%20posts/blogs/"
-TAG_URL = "https://api.github.com/repos/icehongssii/tech-blog-obsidian/contents/tech-blog/2.%20posts/html/tags.md"                                
-ABOUT_URL = "https://api.github.com/repos/icehongssii/tech-blog-obsidian/contents/tech-blog/2.%20posts/html/about.md"                                
+BASE_URL = os.getenv("CONTENT_SOURCE_URL")
+BASE_URL = "https://api.github.com/repos/icehongssii/tech-blog-obsidian/contents/tech-blog/2.%20posts"
+INDEX_SOURCE = BASE_URL + "/blogs/"
+POST_SOURCE = BASE_URL + "/blogs/"
+TAGS_SOURCE = BASE_URL + "/html/tags.md"
+ABOUT_SOURCE = BASE_URL +"/html/about.md"
 
 def fetch_github_content(url):
+    response = req.get(url)
+    data = response.text
+    return data
     # Create a unique key for storing the content in Redis.
     # This could be the URL itself or some other unique identifier.
     cache_key = f"content:{url}"
@@ -84,9 +91,9 @@ def extract_tags_from_html(html_content):
     return data_dict
 
 # # Route Handlers
-@app.get("/about", response_class=HTMLResponse)
+@app.get("/", response_class=HTMLResponse)
 def get_about(request:Request):
-    data = json.loads(fetch_github_content(TAG_URL))
+    data = json.loads(fetch_github_content(ABOUT_SOURCE))
     decoded_post = base64.b64decode(data['content']).decode('utf-8')
     html_content = convert_md_to_html(decoded_post)
     return templates.TemplateResponse("about.html", {"request": request, "html": html_content})
@@ -94,7 +101,7 @@ def get_about(request:Request):
 
 @app.get("/tags", response_class=HTMLResponse)
 def get_tags(request:Request):
-    data = json.loads(fetch_github_content(TAG_URL))
+    data = json.loads(fetch_github_content(TAGS_SOURCE))
     decoded_post = base64.b64decode(data['content']).decode('utf-8')
     html_content = convert_md_to_html(decoded_post)
     tags = extract_tags_from_html(html_content)
@@ -104,17 +111,18 @@ def get_tags(request:Request):
 
 @app.get("/posts/{title}", response_class=HTMLResponse)
 def post_detail(request:Request,title:str):
-    data = json.loads(fetch_github_content(URL + f"{title}"))
+    title = parse.quote(title)
+    data = json.loads(fetch_github_content(INDEX_SOURCE + f"{title}"))
     decoded_post = base64.b64decode(data['content']).decode('utf-8')
     html = convert_md_to_html(decoded_post)
     html.metadata['last_updated'] = html.metadata['last-updated']
     return templates.TemplateResponse("post.html", {"request": request, "meta": html.metadata, "html": html})
 
-@app.get("/", response_class=HTMLResponse)
+@app.get("/posts", response_class=HTMLResponse)
 def index(request:Request):
-    data = json.loads(fetch_github_content(URL))
-    post_cnt = len(data)    
-    posts = [{"url": p['url'].split(URL)[1], "name": p['name']} for p in data]
+    data = json.loads(fetch_github_content(INDEX_SOURCE))
+    post_cnt = len(data)
+    posts = [{"url": p['url'].split(POST_SOURCE)[1], "name": p['name']} for p in data]
     return templates.TemplateResponse("index.html", {"request": request, "posts": posts, "cnt": post_cnt})
     
 
